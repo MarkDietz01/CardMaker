@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CardMaker Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <script id="html2canvas-local" src="libs/html2canvas.min.js" defer></script>
+  <script id="jspdf-local" src="libs/jspdf.umd.min.js" defer></script>
+  <script>
+    const fallbackScript = (id, url) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.addEventListener('error', () => {
+        const s = document.createElement('script');
+        s.src = url;
+        s.defer = true;
+        document.head.appendChild(s);
+      }, { once: true });
+    };
+
+    fallbackScript('html2canvas-local', 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js');
+    fallbackScript('jspdf-local', 'https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js');
+  </script>
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="logo">CardMaker Studio</div>
+    <div class="meta">
+      <span class="badge">Geïnspireerd door tabletop-creator.com</span>
+      <span class="subtext">Bewerkbaar, professioneel en klaar voor export.</span>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="panel">
+      <h2>Kaartinhoud</h2>
+      <form class="form-grid" id="card-form">
+        <label> Titel
+          <input type="text" name="title" value="Avonturier" />
+        </label>
+        <label> Subtitel
+          <input type="text" name="subtitle" value="Verkenner van de Oude Ruïnes" />
+        </label>
+        <label> Type / Kost
+          <div class="dual-input">
+            <input type="text" name="type" value="Held" />
+            <input type="text" name="cost" value="3 mana" />
+          </div>
+        </label>
+        <label> Primair kleuraccent
+          <input type="color" name="primaryColor" value="#7356d6" />
+        </label>
+        <label> Secundair kleuraccent
+          <input type="color" name="secondaryColor" value="#f2c94c" />
+        </label>
+        <label> Rarity
+          <select name="rarity">
+            <option value="common">Common</option>
+            <option value="rare" selected>Rare</option>
+            <option value="epic">Epic</option>
+            <option value="legendary">Legendary</option>
+          </select>
+        </label>
+        <label> Statistieken
+          <div class="dual-input">
+            <input type="text" name="power" value="5" placeholder="Kracht" />
+            <input type="text" name="defense" value="3" placeholder="Verdediging" />
+          </div>
+        </label>
+        <label> Descriptor
+          <input type="text" name="tags" value="Mens · Scout · Wijs" />
+        </label>
+        <label class="full"> Beschrijving
+          <textarea name="description" rows="3">Wanneer Avonturier het veld betreedt, trek een kaart. Betaal 1 mana om een vijandelijke val te ontwapenen.</textarea>
+        </label>
+        <label> Highlight icoon
+          <select name="icon">
+            <option value="🧭">🧭 Kompas</option>
+            <option value="⚔️">⚔️ Zwaarden</option>
+            <option value="🧙‍♂️">🧙‍♂️ Magiër</option>
+            <option value="🐉">🐉 Draak</option>
+            <option value="🧪">🧪 Elixer</option>
+          </select>
+        </label>
+        <label> Achtergrondtextuur
+          <select name="texture">
+            <option value="none">Vlak</option>
+            <option value="grid">Raster</option>
+            <option value="dots">Punten</option>
+            <option value="linen">Linnen</option>
+          </select>
+        </label>
+
+        <div class="section-heading full">
+          <div>
+            <p class="label">Panel & media</p>
+            <p class="hint">Dezelfde opties als in het voorbeeld, maar volledig AI-vrij.</p>
+          </div>
+          <span class="chip ghost">Layer tools</span>
+        </div>
+
+        <label class="full"> Paneltype
+          <select name="panelType">
+            <option value="gradient">Gradient panel</option>
+            <option value="image" selected>Afbeelding</option>
+            <option value="hybrid">Afbeelding + gradient</option>
+          </select>
+        </label>
+        <label class="full"> Afbeelding URL
+          <input type="text" name="imageUrl" value="https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?auto=format&fit=crop&w=900&q=80" />
+        </label>
+        <input type="file" id="image-upload" accept="image/*" hidden />
+        <div class="button-row full">
+          <button type="button" id="swap-art">Swap preset</button>
+          <button type="button" id="image-picker">Open image picker</button>
+          <button type="button" id="reset-transform" class="ghost-btn">Reset transform</button>
+        </div>
+        <label> Afbeelding fit
+          <select name="imageFit">
+            <option value="cover" selected>Vullen</option>
+            <option value="contain">Binnen houden</option>
+          </select>
+        </label>
+        <label> Blend mode
+          <select name="heroBlend">
+            <option value="normal" selected>Normaal</option>
+            <option value="screen">Screen</option>
+            <option value="multiply">Multiply</option>
+            <option value="overlay">Overlay</option>
+            <option value="soft-light">Soft light</option>
+          </select>
+        </label>
+        <label> Doorzichtigheid
+          <input type="range" name="heroOpacity" min="0.2" max="1" step="0.05" value="1" />
+        </label>
+        <label> Schaal
+          <input type="range" name="heroScale" min="0.5" max="1.6" step="0.05" value="1" />
+        </label>
+        <label> Rotatie (°)
+          <input type="range" name="heroRotation" min="-45" max="45" step="1" value="0" />
+        </label>
+        <label> Offset X (px)
+          <input type="number" name="heroX" value="0" min="-200" max="200" />
+        </label>
+        <label> Offset Y (px)
+          <input type="number" name="heroY" value="0" min="-200" max="200" />
+        </label>
+        <label> Flip
+          <div class="toggle-row">
+            <label class="toggle">
+              <input type="checkbox" name="heroFlipX" />
+              <span>Horizontaal</span>
+            </label>
+            <label class="toggle">
+              <input type="checkbox" name="heroFlipY" />
+              <span>Verticaal</span>
+            </label>
+          </div>
+        </label>
+        <label> Paneelkleur
+          <input type="color" name="backgroundColor" value="#0f1117" />
+        </label>
+
+        <div class="section-heading full">
+          <div>
+            <p class="label">Masker & diepte</p>
+            <p class="hint">Zelfde radius/sliders als in het voorbeeld.</p>
+          </div>
+          <span class="chip ghost">Snijlijn</span>
+        </div>
+
+        <label> Ronding
+          <input type="range" name="radius" min="8" max="28" value="16" />
+        </label>
+        <label> Schaduw diepte
+          <input type="range" name="shadow" min="0" max="32" value="16" />
+        </label>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h2>Export-instellingen</h2>
+      <form class="form-grid" id="export-form">
+        <label> Grootte preset
+          <select name="preset" id="size-preset">
+            <option value="poker">Poker (63×88mm)</option>
+            <option value="tarot">Tarot (70×120mm)</option>
+            <option value="mini">Mini (44×68mm)</option>
+            <option value="custom" selected>Custom</option>
+          </select>
+        </label>
+        <label> Breedte (px)
+          <input type="number" name="width" value="750" min="400" max="2000" />
+        </label>
+        <label> Hoogte (px)
+          <input type="number" name="height" value="1050" min="400" max="2800" />
+        </label>
+        <label> DPI / schaal
+          <input type="number" name="scale" value="2" min="1" max="4" step="0.25" />
+        </label>
+        <label> Bestandsformaat
+          <select name="format">
+            <option value="png">PNG (transparant)</option>
+            <option value="jpeg">JPEG</option>
+            <option value="pdf">PDF</option>
+          </select>
+        </label>
+        <label> Bleed (px)
+          <input type="number" name="bleed" value="24" min="0" max="120" />
+        </label>
+        <label> Marges en snijlijnen
+          <div class="checkbox">
+            <input type="checkbox" name="cropMarks" checked />
+            <span>Crop marks & safe zone overlay</span>
+          </div>
+        </label>
+        <label> Achtergrond
+          <div class="checkbox">
+            <input type="checkbox" name="transparent" />
+            <span>Maak achtergrond transparant</span>
+          </div>
+        </label>
+        <label class="full"> Exportprofiel
+          <textarea name="notes" rows="2">Preserve tekst, vectorfeel en contrastrijke kleuren voor print.</textarea>
+        </label>
+      </form>
+      <div class="actions">
+        <button id="duplicate">Duplicate naar Deck</button>
+        <button class="primary" id="export">Exporteer kaart</button>
+        <button class="ghost" id="export-sheet">Exporteer 3×3 sheet</button>
+      </div>
+      <p class="hint">Elke export gebruikt je huidige instellingen. Kies PNG, JPEG of PDF en krijg bleed, crop marks en juiste schaal.</p>
+    </section>
+
+    <section class="preview-panel">
+      <div class="preview-header">
+        <div>
+          <p class="label">Live preview</p>
+          <h3>Kaart & Deck</h3>
+        </div>
+        <div class="viewport-meta">
+          <span class="chip" id="size-mm">63 × 88 mm</span>
+          <span class="chip" id="size-in">2.48 × 3.46 in</span>
+          <span class="chip" id="size-px">750 × 1050 px</span>
+        </div>
+      </div>
+      <div class="mini-legend">
+        <span class="chip">Bleed</span>
+        <span class="chip">Safe zone</span>
+        <span class="chip">Crop marks</span>
+      </div>
+      <div class="preview-area">
+        <div id="card-preview" class="card"></div>
+        <div class="deck" id="deck"></div>
+      </div>
+    </section>
+  </main>
+
+  <template id="card-template">
+    <div class="card-inner">
+      <div class="card-hero">
+        <div class="hero-frame">
+          <div class="hero-media"></div>
+          <div class="hero-gradient"></div>
+          <div class="hero-grid"></div>
+        </div>
+        <div class="hero-overlay">
+          <p class="hero-name">New Card</p>
+          <p class="measure-mm">63 × 88 mm</p>
+          <p class="measure-in">2.48 × 3.46 in</p>
+        </div>
+      </div>
+      <div class="card-header">
+        <span class="rarity"></span>
+        <span class="icon"></span>
+      </div>
+      <div class="card-title">
+        <div class="title"></div>
+        <div class="subtitle"></div>
+      </div>
+      <div class="card-meta">
+        <span class="type"></span>
+        <span class="cost"></span>
+      </div>
+      <div class="card-body">
+        <div class="tags"></div>
+        <div class="description"></div>
+      </div>
+      <div class="card-stats">
+        <div>
+          <p class="label">Kracht</p>
+          <p class="value power"></p>
+        </div>
+        <div>
+          <p class="label">Verdediging</p>
+          <p class="value defense"></p>
+        </div>
+      </div>
+    </div>
+  </template>
+</body>
+</html>

@@ -1,0 +1,11 @@
+node_modules/
+dist/
+out/
+build/
+.vs/
+**/bin/
+**/obj/
+.DS_Store
+*.log
+coverage/
+playwright-report/
