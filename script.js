@@ -236,6 +236,9 @@ function buildExportCard(data, settings) {
 }
 
 async function exportNode(node, settings, filenameBase) {
+  if (typeof html2canvas !== 'function') {
+    throw new Error('Exportbibliotheek html2canvas is niet geladen. Controleer je internet of voer build-windows.ps1 uit om lokale libs te downloaden.');
+  }
   document.body.appendChild(node);
   const canvas = await html2canvas(node, {
     scale: settings.scale,
@@ -321,6 +324,8 @@ exportBtn.addEventListener('click', async () => {
   exportBtn.textContent = 'Exporteren...';
   try {
     await exportSingle();
+  } catch (err) {
+    alert(err?.message || 'Exporteren mislukt.');
   } finally {
     exportBtn.disabled = false;
     exportBtn.textContent = 'Exporteer kaart';
@@ -332,6 +337,8 @@ exportSheetBtn.addEventListener('click', async () => {
   exportSheetBtn.textContent = 'Sheet exporteren...';
   try {
     await exportSheet();
+  } catch (err) {
+    alert(err?.message || 'Exporteren van sheet mislukt.');
   } finally {
     exportSheetBtn.disabled = false;
     exportSheetBtn.textContent = 'Exporteer 3×3 sheet';

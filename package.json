@@ -1,0 +1,11 @@
+{
+  "name": "cardmaker-studio",
+  "version": "1.1.0",
+  "description": "Testbare webapp voor CardMaker Studio",
+  "scripts": {
+    "test": "node tests/ui-smoke.test.js"
+  },
+  "devDependencies": {
+    "jsdom": "22.1.0"
+  }
+}
